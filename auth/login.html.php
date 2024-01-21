@@ -1,5 +1,4 @@
 <?php include "../includes/header.php"; ?>
-<?php include "../config/config.php"; ?>
     <div class="row justify-content-center">
         <div class="col-md-6" style="margin-bottom: 200px; margin-top: 50px;">
             <form class="form-control mt-5" method="post" action="login.php">
