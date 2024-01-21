@@ -60,6 +60,9 @@
                 <li class="nav-item">
                     <a class="nav-link  text-white" href="../../shop/auth/register.html.php">Register</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link  text-white" href="../../shop/auth/logout.php">Logout</a>
+                </li>
             </ul>
         </div>
     </div>
