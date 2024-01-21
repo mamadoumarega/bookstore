@@ -1,39 +1,45 @@
 <?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-global $pdo;
-require_once "../config/config.php";
+include "../config/config.php";
+$errors = null;
 
+if (isset($_POST['submit'])) {
     $username = htmlspecialchars($_POST['username']);
     $email = htmlspecialchars($_POST['email']);
     $password = htmlspecialchars($_POST['password']);
 
-    if (isset($_POST['submit'])) {
-        if (empty($username) OR empty($email) OR empty($password)) {
-            echo "<script type='application/javascript'>alert('Les champs ne doivent pas être vide')</script>";
-        } else {
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $query = $pdo->prepare("SELECT * FROM user WHERE email = ?");
-                $query->execute([$email]);
-                $result = $query->fetch();
+    if (empty($username) || empty($email) || empty($password)) {
+        echo "<script type='application/javascript'>alert('Les champs ne doivent pas être vides')</script>";
+    } else {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $query = $pdo->prepare("SELECT * FROM user WHERE email = :email");
+            $query->execute([
+                ':email' => $email
+            ]);
+            $result = $query->fetch();
 
-                if ($result) {
-                    $errors = "User already exists";
-                } else {
-                    $pass = password_hash($password, PASSWORD_DEFAULT);
-                    $query = $pdo->exec("INSERT INTO user (username,email, password) VALUES('$username','$email','$pass')");
-
-                    if ($query) {
-                        $errors = "User registered successfully";
-                    } else {
-                        $errors = "Error during registration";
-                    }
-                }
+            if ($result) {
+                $errors = "User already exists";
             } else {
-                $errors = "Email not valid";
-            }
-        }
+                $pass = password_hash($password, PASSWORD_DEFAULT);
+                $query = $pdo->prepare("INSERT INTO user (username, email, password) VALUES (:username, :email, :password)");
 
-        if ($errors) {
-            echo "<h1>".$errors."</h1>";
+                $query->execute([
+                    ':username' => $username,
+                    ':email' => $email,
+                    ':password' => $pass,
+                ]);
+                header('location:login.html.php');
+            }
+        } else {
+            $errors = "Email not valid";
         }
     }
+
+    if ($errors) {
+        echo "<h1>".$errors."</h1>";
+    }
+}
